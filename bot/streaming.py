@@ -1,5 +1,6 @@
 from langchain_core.callbacks import BaseCallbackHandler
 
+
 class StreamHandler(BaseCallbackHandler):
 
     def __init__(self, container, initial_text=""):

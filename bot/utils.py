@@ -6,10 +6,10 @@ from streamlit.logger import get_logger
 from langchain_openai import ChatOpenAI
 from langchain_community.chat_models import ChatOllama
 
-logger = get_logger('Langchain-Chatbot')
+logger = get_logger("Langchain-Chatbot")
 
 
-#decorator
+# decorator
 def enable_chat_history(func):
     if os.environ.get("OPENAI_API_KEY"):
 
@@ -27,7 +27,9 @@ def enable_chat_history(func):
 
         # to show chat history on ui
         if "messages" not in st.session_state:
-            st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
+            st.session_state["messages"] = [
+                {"role": "assistant", "content": "How can I help you?"}
+            ]
 
         for msg in st.session_state["messages"]:
             st.chat_message(msg["role"]).write(msg["content"])
@@ -54,25 +56,28 @@ def choose_custom_openai_key():
         label="OpenAI API Key",
         type="password",
         placeholder="sk-...",
-        key="SELECTED_OPENAI_API_KEY"
+        key="SELECTED_OPENAI_API_KEY",
     )
     if not openai_api_key:
         st.error("Please add your OpenAI API key to continue.")
-        st.info("Obtain your key from this link: https://platform.openai.com/account/api-keys")
+        st.info(
+            "Obtain your key from this link: https://platform.openai.com/account/api-keys"
+        )
         st.stop()
 
     model = "gpt-4o-mini"
     try:
         client = openai.OpenAI(api_key=openai_api_key)
-        available_models = [{"id": i.id, "created": datetime.fromtimestamp(i.created)} for i in client.models.list() if
-                            str(i.id).startswith("gpt")]
+        available_models = [
+            {"id": i.id, "created": datetime.fromtimestamp(i.created)}
+            for i in client.models.list()
+            if str(i.id).startswith("gpt")
+        ]
         available_models = sorted(available_models, key=lambda x: x["created"])
         available_models = [i["id"] for i in available_models]
 
         model = st.sidebar.selectbox(
-            label="Model",
-            options=available_models,
-            key="SELECTED_OPENAI_MODEL"
+            label="Model", options=available_models, key="SELECTED_OPENAI_MODEL"
         )
     except openai.AuthenticationError as e:
         st.error(e.body["message"])
@@ -87,13 +92,14 @@ def choose_custom_openai_key():
 def configure_llm():
     available_llms = ["gpt-4o-mini", "gpt-3.5-turbo"]
 
-    llm_opt = st.sidebar.radio(
-        label="LLM",
-        options=available_llms,
-        key="SELECTED_LLM"
-    )
+    llm_opt = st.sidebar.radio(label="LLM", options=available_llms, key="SELECTED_LLM")
 
-    llm = ChatOpenAI(model_name=llm_opt, temperature=0, streaming=True, api_key=os.getenv("OPENAI_API_KEY"))
+    llm = ChatOpenAI(
+        model_name=llm_opt,
+        temperature=0,
+        streaming=True,
+        api_key=os.getenv("OPENAI_API_KEY"),
+    )
 
     return llm
 
@@ -101,7 +107,6 @@ def configure_llm():
 def print_qa(cls, question, answer):
     log_str = "\nUsecase: {}\nQuestion: {}\nAnswer: {}\n" + "------" * 10
     logger.info(log_str.format(cls.__name__, question, answer))
-
 
 
 def sync_st_session():

@@ -6,6 +6,7 @@ from pydantic_settings import BaseSettings
 
 load_dotenv()
 
+
 class Settings(BaseSettings):
     env_name: str = "Local"
 
